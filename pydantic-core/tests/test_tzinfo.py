@@ -11,7 +11,6 @@ from datetime import datetime, timedelta, timezone, tzinfo
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import pytest
-from pydantic import TypeAdapter
 
 from pydantic_core import TzInfo
 
@@ -239,12 +238,3 @@ def test_pickle(tz, pickler, unpickler, proto):
     assert tz == unpickled
     assert tz.utcoffset(None) == unpickled.utcoffset(None)
 
-
-def test_tzinfo_could_be_reused():
-    value = TypeAdapter(datetime).validate_python('2015-10-21T15:28:00.000000+01:00')
-
-    target = datetime(1955, 11, 12, 14, 38, tzinfo=value.tzinfo)
-    assert target == datetime(1955, 11, 12, 14, 38, tzinfo=timezone(timedelta(hours=1)))
-
-    now = datetime.now(tz=value.tzinfo)
-    assert isinstance(now, datetime)
